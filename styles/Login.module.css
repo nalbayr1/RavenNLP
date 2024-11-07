@@ -1,0 +1,136 @@
+.container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #000000; /* Black background */
+  }
+  
+  .formSection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    background-color: #000000; /* Form section stays black */
+  }
+  
+  .logo {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .logo img {
+    width: auto;
+    height: 150px;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+    font-family: "Georgia", serif;
+    color: #cccccc; /* Softer gray for title */
+  }
+  
+  .subtitle {
+    font-size: 1.2rem;
+    color: #aaaaaa; /* Softer gray for subtitle */
+    margin-bottom: 30px;
+    text-align: center;
+    font-family: "Georgia", serif;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    align-items: center;
+  }
+  
+  .inputField {
+    margin-bottom: 20px;
+    padding: 15px;
+    font-size: 16px;
+    border: 1px solid #333333; /* Darker gray for border */
+    background-color: #1c1c1c; /* Dark gray background for inputs */
+    color: #dddddd; /* Light gray for input text */
+    border-radius: 8px;
+    width: 100%;
+    font-family: "Georgia", serif;
+  }
+  
+  .options {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #aaaaaa; /* Softer gray for options */
+    font-family: "Georgia", serif;
+  }
+  
+  .forgotPassword {
+    color: #D0A043; /* Softer gray for links */
+    text-decoration: none;
+  }
+  
+  .forgotPassword:hover {
+    text-decoration: underline;
+  }
+  
+  .submitButton {
+    padding: 15px;
+    font-size: 16px;
+    background-color: #D0A043;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    font-family: "Georgia", serif;
+  }
+  
+  .submitButton:hover {
+    background-color: #E11E2B;
+  }
+  
+  .signUp {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #aaaaaa; /* Softer gray for sign up text */
+    text-align: center;
+    font-family: "Georgia", serif;
+  }
+  
+  .signUp a {
+    color: #D0A043;
+    text-decoration: none;
+  }
+  
+  .signUp a:hover {
+    text-decoration: underline;
+  }
+  
+  .backgroundSection {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000000;
+  }
+  
+  .backgroundImage {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+  

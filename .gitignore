@@ -1,0 +1,27 @@
+# Ignore macOS system files
+.DS_Store
+
+# Ignore node_modules
+node_modules/
+
+# Ignore environment files
+.env
+next-env.d.ts
+
+# Ignore build and config files
+.next/
+out/
+dist/
+coverage/
+
+# Ignore lock files if using only one package manager
+yarn.lock
+package-lock.json
+
+# Ignore logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore Prisma files and other project-specific folders
+prisma/.env
