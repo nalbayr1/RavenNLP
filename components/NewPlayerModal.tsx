@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../my-app/src/firebase'; // Adjust path as necessary
+import { storage } from '../../my-app/src/firebase';
 
 interface NewPlayerModalProps {
   onClose: () => void;
@@ -11,9 +11,9 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
   const [details, setDetails] = useState<string>('');
   const [photo, setPhoto] = useState<File | null>(null);
   const [textFiles, setTextFiles] = useState<File[]>([]);
-  const [loading, setLoading] = useState<boolean>(false); // Loading state
+  const [loading, setLoading] = useState<boolean>(false); 
 
-  const defaultPhotoPath = '/photos/noattachment.png'; // Default photo path
+  const defaultPhotoPath = '/photos/noattachment.png'; 
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -31,7 +31,6 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
 
   const uploadPhotoToFirebase = async (): Promise<string> => {
     if (!photo) {
-      // Return the default photo path if no photo is uploaded
       return defaultPhotoPath;
     }
     const storageRef = ref(storage, `players/photos/${photo.name}`);
@@ -42,24 +41,22 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
       return url;
     } catch (error) {
       console.error('Failed to upload image:', error);
-      return defaultPhotoPath; // Return default photo in case of an error
+      return defaultPhotoPath; 
     }
   };
 
   const handleSubmit = async () => {
-    setLoading(true); // Start loading
+    setLoading(true); 
     try {
       console.log('Submitting form...');
       const uploadedPhotoURL = await uploadPhotoToFirebase();
-
-      // Create the player with the photo URL
       const playerResponse = await fetch('/api/players/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: playerName,
           details,
-          photoURL: uploadedPhotoURL, // Use the uploaded or default photo URL
+          photoURL: uploadedPhotoURL,
         }),
       });
 
@@ -71,14 +68,13 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
       const { player } = await playerResponse.json();
       console.log('Player created:', player);
 
-      // Read text file contents
+     
       let textContent = '';
       if (textFiles.length > 0) {
         const file = textFiles[0];
         textContent = await file.text();
       }
 
-      // Send data to GPT
       const gptResponse = await fetch('/api/chatgpt/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -86,7 +82,7 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
           playerId: player.id,
           name: player.name,
           details,
-          textContent, // Send actual text file content
+          textContent,
         }),
       });
 
@@ -98,13 +94,13 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
       const gptResult = await gptResponse.json();
       console.log('GPT Response:', gptResult);
 
-      // Delay before refreshing the page
+     
       setTimeout(() => {
         window.location.reload();
       }, 1000); 
     } catch (error) {
       console.error('Error during form submission:', error);
-      setLoading(false); // Stop loading on error
+      setLoading(false); 
     }
   };
 
@@ -124,7 +120,7 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
       <div style={modalContentStyle}>
         <h2 style={titleStyle}>Add New Player</h2>
 
-        {/* Player Name Input */}
+        
         <input
           type="text"
           placeholder="Enter player's name"
@@ -133,7 +129,7 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
           style={inputStyle}
         />
 
-        {/* Details Input */}
+       
         <input
           type="text"
           placeholder="Type wanted details"
@@ -142,7 +138,7 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
           style={inputStyle}
         />
 
-        {/* Photo Upload */}
+       
         <div style={{ marginBottom: '15px', textAlign: 'left' }}>
           <label style={{ marginBottom: '5px', display: 'block', fontWeight: 'bold' }}>Upload Photo</label>
           <input
@@ -153,7 +149,7 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
           />
         </div>
 
-        {/* Text File Upload */}
+      
         <div style={{ marginBottom: '20px', textAlign: 'left' }}>
           <label style={{ marginBottom: '5px', display: 'block', fontWeight: 'bold' }}>Upload Text Files</label>
           <input
@@ -165,7 +161,7 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
           />
         </div>
 
-        {/* Submit Button */}
+        
         <button onClick={handleSubmit} style={submitButtonStyle}>Submit</button>
         <button onClick={onClose} style={cancelButtonStyle}>Cancel</button>
       </div>
@@ -175,7 +171,7 @@ const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
 
 export default NewPlayerModal;
 
-// Styles for the modal and buttons (retain original styles)
+
 const modalContainerStyle: React.CSSProperties = {
   position: 'fixed',
   top: 0,

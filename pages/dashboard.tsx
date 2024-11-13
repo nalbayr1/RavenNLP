@@ -2,13 +2,13 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import PlayerList from '../components/PlayerList';
-import NewPlayerModal from '../components/NewPlayerModal'; // Import the modal
+import NewPlayerModal from '../components/NewPlayerModal'; 
 
 export default function Dashboard() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(''); // State to track search input
-  const [isModalOpen, setIsModalOpen] = useState(false); // State to track modal visibility
+  const [searchQuery, setSearchQuery] = useState(''); 
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -46,15 +46,15 @@ export default function Dashboard() {
         color: 'white',
         display: 'flex',
         flexDirection: 'column', 
-        position: 'relative', // For modal background blur effect
+        position: 'relative', 
       }}>
-        {/* Container for Player Search heading and search bar */}
+        
         <div style={{
-          backgroundColor: '#000',  // Black background for the search container
+          backgroundColor: '#000',  
           padding: '20px',
           borderRadius: '10px',
-          marginRight: '10px', // Extra margin to expand to the right
-          marginBottom: '30px', // Extra margin at the bottom
+          marginRight: '10px', 
+          marginBottom: '30px', 
         }}>
           <h1 style={{
             fontSize: '2rem',
@@ -62,7 +62,7 @@ export default function Dashboard() {
             color: '#ecf0f1',
           }}>Player Search</h1>
 
-          {/* Search Bar */}
+         
           <input
             type="text"
             placeholder="Search for a player..."
@@ -74,18 +74,18 @@ export default function Dashboard() {
               borderRadius: '5px',
               border: '1px solid #ddd',
               fontSize: '1rem',
-              backgroundColor: '#2c2c2c',  // Dark gray background for search input
-              color: '#ecf0f1',  // Light text color for better visibility
+              backgroundColor: '#2c2c2c', 
+              color: '#ecf0f1',  
             }}
           />
 
-          {/* New Player Button */}
+         
           <button
             onClick={handleOpenModal}
             style={{
               marginTop: '15px',
               padding: '10px 20px',
-              backgroundColor: '#27ae60', // Green button
+              backgroundColor: '#27ae60', 
               color: '#fff',
               border: 'none',
               borderRadius: '5px',
@@ -97,19 +97,19 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Scrollable Player List */}
+       
         <div style={{
-          flexGrow: 1, // Take available vertical space
-          overflowY: 'auto', // Make it scrollable vertically
-          backgroundColor: '#22186B', // Match the page background
+          flexGrow: 1, 
+          overflowY: 'auto',
+          backgroundColor: '#22186B', 
           padding: '10px', 
-          borderRadius: '10px', // Add some border radius to match styling
+          borderRadius: '10px', 
         }}>
-          <PlayerList searchQuery={searchQuery} /> {/* Pass search query to PlayerList */}
+          <PlayerList searchQuery={searchQuery} /> 
         </div>
 
-        {/* Modal for New Player */}
-        {isModalOpen && <NewPlayerModal onClose={handleCloseModal} />} {/* Pass close handler */}
+        
+        {isModalOpen && <NewPlayerModal onClose={handleCloseModal} />} 
       </div>
     </div>
   );

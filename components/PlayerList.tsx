@@ -1,38 +1,38 @@
 import React, { useState, useEffect } from 'react';
 
 interface PlayerListProps {
-  searchQuery: string; // Accept search query as a prop
+  searchQuery: string; 
 }
 
 const PlayerList: React.FC<PlayerListProps> = ({ searchQuery }) => {
-  const [players, setPlayers] = useState<any[]>([]); // Initialize with an empty array
-  const [loading, setLoading] = useState(true); // Add a loading state
-  const [error, setError] = useState<string | null>(null); // Track any errors
-  const [bioVisible, setBioVisible] = useState<{ [key: number]: boolean }>({}); // Track visibility of player bios
+  const [players, setPlayers] = useState<any[]>([]); 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [bioVisible, setBioVisible] = useState<{ [key: number]: boolean }>({}); 
 
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
-        const res = await fetch('/api/players/'); // Adjusted API route
+        const res = await fetch('/api/players/'); 
         if (!res.ok) {
           throw new Error(`Failed to fetch players: ${res.statusText}`);
         }
         const data = await res.json();
         console.log('Players fetched from the API:', data);
-        setPlayers(data); // Set the players data
-        setBioVisible(data.reduce((acc: any, _: any, i: number) => ({ ...acc, [i]: true }), {})); // Make bios initially visible
+        setPlayers(data);
+        setBioVisible(data.reduce((acc: any, _: any, i: number) => ({ ...acc, [i]: true }), {}));
       } catch (error) {
         console.error('Error fetching players:', error);
         setError('Error fetching players');
       } finally {
-        setLoading(false); // Turn off loading state
+        setLoading(false);
       }
     };
 
     fetchPlayers();
   }, []);
 
-  // Toggle player bio visibility
+  
   const toggleBioVisibility = (index: number) => {
     setBioVisible((prevState) => ({
       ...prevState,
@@ -41,14 +41,14 @@ const PlayerList: React.FC<PlayerListProps> = ({ searchQuery }) => {
   };
 
   if (loading) {
-    return <div>Loading players...</div>; // Handle loading state
+    return <div>Loading players...</div>; 
   }
 
   if (error) {
-    return <div>{error}</div>; // Show error message
+    return <div>{error}</div>;
   }
 
-  // Filter players based on the search query
+ 
   const filteredPlayers = players.filter((player) =>
     player.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -56,17 +56,17 @@ const PlayerList: React.FC<PlayerListProps> = ({ searchQuery }) => {
   return (
     <div style={{
       display: 'flex',
-      flexDirection: 'column', // Stack players vertically
+      flexDirection: 'column', 
       gap: '20px',
       padding: '20px',
-      backgroundColor: '#22186B', // Set main background color
+      backgroundColor: '#22186B', 
     }}>
       {filteredPlayers.length > 0 ? (
         filteredPlayers.map((player: any, index: number) => (
           <div key={index} style={{
             display: 'flex',
-            alignItems: 'center', // Center content vertically
-            backgroundColor: '#000000', // Player container color set to Black
+            alignItems: 'center', 
+            backgroundColor: '#000000',
             color: '#ecf0f1',
             padding: '20px',
             borderRadius: '10px',
@@ -74,14 +74,14 @@ const PlayerList: React.FC<PlayerListProps> = ({ searchQuery }) => {
           }}>
             {player.photo && (
               <div style={{
-                flexShrink: 0, // Prevent image from shrinking
-                width: '300px', // Increase the width of the image container
-                height: '300px', // Increase the height of the image container
+                flexShrink: 0, 
+                width: '300px', 
+                height: '300px', 
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginRight: '20px',
-                overflow: 'hidden', // Ensure no content spills out
+                overflow: 'hidden', 
               }}>
                 <img
                   src={player.photo}
@@ -89,8 +89,8 @@ const PlayerList: React.FC<PlayerListProps> = ({ searchQuery }) => {
                   style={{
                     width: '100%',
                     height: '100%',
-                    borderRadius: '80px', // Updated to round the image more
-                    objectFit: 'contain', // Prevent image from being cropped
+                    borderRadius: '80px', 
+                    objectFit: 'contain', 
                   }}
                 />
               </div>
@@ -106,7 +106,7 @@ const PlayerList: React.FC<PlayerListProps> = ({ searchQuery }) => {
               {bioVisible[index] && (
                 <div style={{
                   marginTop: '15px',
-                  backgroundColor: '#2c2c2c', // Bio container color set to Dark Gray
+                  backgroundColor: '#2c2c2c', 
                   padding: '15px',
                   borderRadius: '5px',
                   border: '1px solid #444',

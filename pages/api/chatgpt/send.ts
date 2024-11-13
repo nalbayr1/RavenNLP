@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '../../../src/prisma'; // Adjust the path based on your setup
+import { prisma } from '../../../src/prisma'; 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -7,8 +7,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       console.log('Received request to call GPT API:', { playerId, name, details, textContent });
-
-      // Call the ChatGPT API
       const gptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -35,7 +33,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const gptData = await gptResponse.json();
       const gptResult = gptData.choices[0]?.message.content || 'No response from GPT';
 
-      // Parse stats from the GPT response
       const heightMatch = gptResult.match(/Height:\s*(.*)/i);
       const ageMatch = gptResult.match(/Age:\s*(.*)/i);
       const weightMatch = gptResult.match(/Weight:\s*(.*)/i);
@@ -46,7 +43,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const weight = weightMatch ? weightMatch[1].trim() : 'Unavailable';
       const position = positionMatch ? positionMatch[1].trim() : 'Unavailable';
 
-      // Update the player record with structured stats and GPT response in playerInfo
       const updatedPlayer = await prisma.player.update({
         where: { id: Number(playerId) },
         data: { 

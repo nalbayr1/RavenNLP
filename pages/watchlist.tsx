@@ -30,10 +30,10 @@ export default function Watchlist() {
       <div style={{
         flexGrow: 1,
         padding: '20px',
-        backgroundColor: '#22186B', // Match the background color
+        backgroundColor: '#22186B',
         color: 'white',
         display: 'flex',
-        flexDirection: 'column', // Stack content vertically
+        flexDirection: 'column', 
       }}>
         <div style={{
           backgroundColor: '#000',

@@ -3,23 +3,23 @@ import { prisma } from '../../../src/prisma';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { name, details, photoURL } = req.body; // Ensure photoURL is included
+    const { name, details, photoURL } = req.body; 
 
     try {
       console.log("Received player creation request:", { name, details, photoURL });
 
-      // Check if player name, details, and photoURL are provided
+     
       if (!name || !details || !photoURL) {
         console.error("Missing required fields:", { name, details, photoURL });
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
-      // Create the new player in the database
+     
       const newPlayer = await prisma.player.create({
         data: {
           name,
-          photo: photoURL, // Save the photo URL
-          playerInfo: details, // Store the initial player details
+          photo: photoURL, 
+          playerInfo: details, 
         },
       });
 

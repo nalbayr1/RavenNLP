@@ -7,26 +7,26 @@ interface TeamCardProps {
 const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
   return (
     <div style={{
-      backgroundColor: '#000000', // Dark container background
+      backgroundColor: '#000000', 
       borderRadius: '10px',
-      padding: '40px', // Further increased padding to make the content larger
-      margin: '5px', // Reduced margin between cards
+      padding: '40px',
+      margin: '5px', 
       textAlign: 'center',
       color: '#ecf0f1',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'space-between',
-      minWidth: '300px', // Increased width to 300px
+      minWidth: '300px', 
       maxWidth: '300px',
-      height: '350px', // Increased height to 350px
-      boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // Add some shadow for effect
+      height: '350px', 
+      boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', 
     }}>
-      <h2 style={{ fontSize: '1.5rem' }}>{team.name}</h2> {/* Increased font size */}
+      <h2 style={{ fontSize: '1.5rem' }}>{team.name}</h2> 
       <button style={{
-        marginTop: 'auto', // Push the button to the bottom
-        padding: '15px 25px', // Increased padding for the button
-        backgroundColor: '#D0A043', // Gold-ish color
+        marginTop: 'auto',
+        padding: '15px 25px',
+        backgroundColor: '#D0A043',
         border: 'none',
         borderRadius: '5px',
         color: '#fff',

@@ -7,25 +7,25 @@ const Sidebar: React.FC = () => {
     <div style={{
       width: '250px',
       height: '100vh',
-      backgroundColor: '#000000', // Black background
+      backgroundColor: '#000000',
       padding: '20px',
       color: '#ecf0f1',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
     }}>
-      {/* Logo and Header Section */}
+      
       <div>
         <div style={{ marginBottom: '20px', textAlign: 'center' }}>
           <Image
-            src="/photos/baltimore-ravens-logo-transparent.png" // Replace with the correct path
+            src="/photos/baltimore-ravens-logo-transparent.png" 
             alt="Logo"
             width={225}
             height={150}
           />
         </div>
 
-        {/* Navigation Links with Containers */}
+        
         <ul style={{ listStyleType: 'none', padding: 0 }}>
           <li style={containerStyle}>
             <Link href="/dashboard" style={linkStyle}>
@@ -50,28 +50,28 @@ const Sidebar: React.FC = () => {
         </ul>
       </div>
 
-      {/* Footer (optional) */}
+      
       <div style={{ textAlign: 'center', fontSize: '12px', color: '#95a5a6' }}>
-        v1.0.0 {/* Optional version info */}
+        v1.0.0 
       </div>
     </div>
   );
 };
 
-// Styling for the containers and links
+
 const linkStyle = {
   color: '#ecf0f1',
   textDecoration: 'none',
-  fontSize: '18px',  // Increased font size
+  fontSize: '18px', 
   display: 'block',
   padding: '10px 20px',
   transition: 'color 0.3s ease',
 };
 
 const containerStyle = {
-  backgroundColor: '#22186B',  // Container background color
-  marginBottom: '10px',  // Space between containers
-  borderRadius: '8px',  // Rounded corners
+  backgroundColor: '#22186B',  
+  marginBottom: '10px',  
+  borderRadius: '8px',  
   transition: 'background-color 0.3s ease',
 };
 
