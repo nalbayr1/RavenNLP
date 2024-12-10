@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../my-app/src/firebase';
+// import { storage } from '../../my-app/src/firebase';
+import { storage } from '../src/firebase';
 
 interface NewPlayerModalProps {
   onClose: () => void;

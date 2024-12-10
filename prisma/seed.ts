@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
+const fs = require('fs');
 
 const prisma = new PrismaClient();
 
@@ -24,7 +25,7 @@ async function main() {
   const existingPlayer1 = await prisma.player.findFirst({
     where: {
       name: "Jermaine Johnson",
-      age: 24,
+      age: "24",
       position: "Defensive End",
     },
   });
@@ -34,8 +35,8 @@ async function main() {
       data: {
         name: "Jermaine Johnson",
         height: "6'5\"",
-        age: 24,
-        weight: 262,
+        age: "24",
+        weight: "262",
         position: "Defensive End",
         photo: "jermaine_johnson_photo.jpg",
         playerInfo: "unavailable", 
@@ -49,7 +50,7 @@ async function main() {
   const existingPlayer2 = await prisma.player.findFirst({
     where: {
       name: "Lamar Jackson",
-      age: 26,
+      age: "26",
       position: "Quarterback",
     },
   });
@@ -59,8 +60,8 @@ async function main() {
       data: {
         name: "Lamar Jackson",
         height: "6'2\"",
-        age: 26,
-        weight: 212,
+        age: "26",
+        weight: "212",
         position: "Quarterback",
         photo: "lamar_jackson_photo.jpg",
         playerInfo: `
@@ -119,7 +120,7 @@ async function main() {
   const existingPlayer3 = await prisma.player.findFirst({
     where: {
       name: "Jermaine Johnson",
-      age: 25, 
+      age: "25", 
       position: "Wide Receiver", 
     },
   });
@@ -129,8 +130,8 @@ async function main() {
       data: {
         name: "Jermaine Johnson",
         height: "6'0\"",
-        age: 25,
-        weight: 200,
+        age: "25",
+        weight: "200",
         position: "Wide Receiver",
         photo: "jermaine_johnson_wr_photo.jpg",
         playerInfo: "unavailable",
@@ -189,6 +190,40 @@ async function main() {
   } else {
     console.log('Teams already seeded');
   }
+
+  const prospectsObject = JSON.parse(fs.readFileSync("player info/prospects.json", 'utf-8'));
+  for (const player in prospectsObject.prospects) {
+    const prospect = prospectsObject.prospects[player];
+    if (!prospect.name) {
+      continue;
+    }
+    const existingPlayer = await prisma.prospect.findFirst({
+      where: {
+        name: prospect.name,
+        age: prospect.age,
+        position: prospect.position,
+      },
+    });
+
+    if (!existingPlayer) {
+      const player = await prisma.prospect.create({
+        data: {
+          name: prospect.name,
+          height: prospect.height.toString(),
+          weight: prospect.weight.toString(),
+          position: prospect.position,
+          experience: prospect.experience,
+          school: prospect.team_name,
+        },
+      });
+      console.log(`Created player: ${player.name}`);
+    } else {
+      console.log(`Player (${prospect.name}) already exists, skipping creation.`);
+    }
+  }
+  console.log('Seeded prospects');
+
+  
 }
 
 main()

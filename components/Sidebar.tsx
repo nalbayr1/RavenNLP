@@ -43,6 +43,11 @@ const Sidebar: React.FC = () => {
             </Link>
           </li>
           <li style={containerStyle}>
+            <Link href="/prospects" style={linkStyle}>
+              Draft Prospects
+            </Link>
+          </li>
+          <li style={containerStyle}>
             <Link href="/logout" style={{ ...linkStyle, color: '#e74c3c' }}>
               Log Out
             </Link>

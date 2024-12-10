@@ -28,6 +28,17 @@ model Player {
   createdAt  DateTime @default(now())
 }
 
+model Prospect {
+  id         Int      @id @default(autoincrement())
+  name       String
+  height     String?  // New field for Height
+  weight     String?  // New field for Weight
+  position   String?  // New field for Position
+  experience String?  // New field for Experience
+  school     String?  // New field for School
+  createdAt  DateTime @default(now())
+}
+
 
 
 model Team {
