@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const user = await createUser(email, password, name);
       res.status(200).json({ message: "User created successfully", user });
-    } catch (error: any) { 
+    } catch (error: any) { // Cast the error as 'any' or 'Error'
       res.status(500).json({ message: error?.message || "Something went wrong" });
     }
   } else {

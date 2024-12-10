@@ -1,7 +1,9 @@
+// pages/index.tsx
+
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import styles from "../styles/Login.module.css"; 
+import styles from "../styles/Login.module.css"; // Import the CSS file
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -22,9 +24,10 @@ export default function LoginPage() {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem("isLoggedIn", "true");
-        router.push("/dashboard"); 
+        localStorage.setItem("userId", data.userId); // Store userId in localStorage
+        router.push("/dashboard");
       } else {
-        alert(data.message);
+        alert(data.message || "Login failed");
       }
     } catch (error) {
       console.error("An error occurred:", error);
@@ -33,7 +36,7 @@ export default function LoginPage() {
 
   return (
     <div className={styles.container}>
-     
+      {/* Left Side: Form Section */}
       <div className={styles.formSection}>
         <div className={styles.logo}>
           <Image
@@ -81,7 +84,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      
+      {/* Right Side: Background Image Section */}
       <div className={styles.backgroundSection}>
         <Image
           src="/photos/ravensLogo.png"

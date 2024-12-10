@@ -1,3 +1,5 @@
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,15 +10,29 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
   name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   password  String
+  favorites Favorite[] // Relation to the Favorite model
 }
 
 model Player {
+  id          Int        @id @default(autoincrement())
+  name        String
+  photo       String?    // Store the image URL
+  playerInfo  String?
+  height      String?    // New field for Height
+  age         String?    // New field for Age
+  weight      String?    // New field for Weight
+  position    String?    // New field for Position
+  createdAt   DateTime   @default(now())
+  favoritedBy Favorite[] // Relation to the Favorite model
+}
+  
+model Prospect { 
   id         Int      @id @default(autoincrement())
   name       String
   photo      String?  // Store the image URL
@@ -44,4 +60,13 @@ model Prospect {
 model Team {
   id    Int     @id @default(autoincrement())
   name  String  @unique
+}
+
+model Favorite {
+  userId   Int
+  playerId Int
+  user     User   @relation(fields: [userId], references: [id])
+  player   Player @relation(fields: [playerId], references: [id])
+
+  @@id([userId, playerId])
 }

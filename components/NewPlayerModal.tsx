@@ -1,248 +1,315 @@
-import React, { useState } from 'react';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-// import { storage } from '../../my-app/src/firebase';
-import { storage } from '../src/firebase';
+import React, { useState, useEffect } from 'react';
+import { FaStar } from 'react-icons/fa';
+import NotesModal from './NotesModal'; // Import the NotesModal component
 
-interface NewPlayerModalProps {
-  onClose: () => void;
+interface Player {
+  id: number;
+  name: string;
+  photo?: string;
+  playerInfo?: string;
+  height?: string;
+  age?: string;
+  weight?: string;
+  position?: string;
 }
 
-const NewPlayerModal: React.FC<NewPlayerModalProps> = ({ onClose }) => {
-  const [playerName, setPlayerName] = useState<string>('');
-  const [details, setDetails] = useState<string>('');
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [textFiles, setTextFiles] = useState<File[]>([]);
-  const [loading, setLoading] = useState<boolean>(false); 
+interface PlayerListProps {
+  searchQuery?: string;
+  players?: Player[];
+}
 
-  const defaultPhotoPath = '/photos/noattachment.png'; 
+const PlayerList: React.FC<PlayerListProps> = ({ searchQuery = '', players: initialPlayers }) => {
+  const [players, setPlayers] = useState<Player[]>(initialPlayers || []);
+  const [loading, setLoading] = useState(!initialPlayers);
+  const [error, setError] = useState<string | null>(null);
+  const [bioVisible, setBioVisible] = useState<{ [key: number]: boolean }>({});
+  const [favoritePlayerIds, setFavoritePlayerIds] = useState<number[]>([]);
+  const [userId, setUserId] = useState<number | null>(null);
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setPhoto(file);
+  // State to manage the open Notes modals
+  const [notesModalOpen, setNotesModalOpen] = useState<{ [key: number]: boolean }>({});
+
+  // Fetch the userId from localStorage on component mount
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId) {
+      setUserId(parseInt(storedUserId, 10));
     }
+  }, []);
+
+  // Fetch all players if not provided as props
+  useEffect(() => {
+    if (!initialPlayers) {
+      const fetchPlayers = async () => {
+        try {
+          const res = await fetch('/api/players');
+          if (!res.ok) {
+            throw new Error(`Failed to fetch players: ${res.statusText}`);
+          }
+          const data = await res.json();
+          setPlayers(data);
+          // Initialize bio visibility and notes modal visibility for each player
+          setBioVisible(
+            data.reduce((acc: any, _: any, i: number) => ({ ...acc, [i]: true }), {})
+          );
+          setNotesModalOpen(
+            data.reduce((acc: any, player: Player) => ({ ...acc, [player.id]: false }), {})
+          );
+        } catch (error) {
+          console.error('Error fetching players:', error);
+          setError('Error fetching players');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchPlayers();
+    } else {
+      // Initialize bio visibility and notes modal visibility for each player
+      setBioVisible(
+        initialPlayers.reduce((acc: any, _: any, i: number) => ({ ...acc, [i]: true }), {})
+      );
+      setNotesModalOpen(
+        initialPlayers.reduce((acc: any, player: Player) => ({ ...acc, [player.id]: false }), {})
+      );
+    }
+  }, [initialPlayers]);
+
+  // Fetch the list of favorite player IDs for the logged-in user
+  useEffect(() => {
+    const fetchFavoritePlayers = async () => {
+      try {
+        if (userId !== null) {
+          const res = await fetch(`/api/users/${userId}/favorites`);
+          if (!res.ok) {
+            throw new Error(`Failed to fetch favorite players: ${res.statusText}`);
+          }
+          const data = await res.json();
+          setFavoritePlayerIds(data.map((player: Player) => player.id));
+        }
+      } catch (error) {
+        console.error('Error fetching favorite players:', error);
+      }
+    };
+
+    fetchFavoritePlayers();
+  }, [userId]);
+
+  // Toggle the visibility of the player's bio
+  const toggleBioVisibility = (index: number) => {
+    setBioVisible((prevState) => ({
+      ...prevState,
+      [index]: !prevState[index],
+    }));
   };
 
-  const handleTextFilesUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      setTextFiles(filesArray);
-    }
-  };
-
-  const uploadPhotoToFirebase = async (): Promise<string> => {
-    if (!photo) {
-      return defaultPhotoPath;
-    }
-    const storageRef = ref(storage, `players/photos/${photo.name}`);
+  // Handle adding or removing a player from favorites
+  const handleFavoriteToggle = async (playerId: number) => {
     try {
-      await uploadBytes(storageRef, photo);
-      const url = await getDownloadURL(storageRef);
-      console.log('Image URL:', url);
-      return url;
-    } catch (error) {
-      console.error('Failed to upload image:', error);
-      return defaultPhotoPath; 
-    }
-  };
-
-  const handleSubmit = async () => {
-    setLoading(true); 
-    try {
-      console.log('Submitting form...');
-      const uploadedPhotoURL = await uploadPhotoToFirebase();
-      const playerResponse = await fetch('/api/players/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: playerName,
-          details,
-          photoURL: uploadedPhotoURL,
-        }),
-      });
-
-      if (!playerResponse.ok) {
-        console.error('Failed to create player:', playerResponse.statusText);
+      if (userId === null) {
+        console.error('User not logged in');
         return;
       }
 
-      const { player } = await playerResponse.json();
-      console.log('Player created:', player);
+      const isFavorited = favoritePlayerIds.includes(playerId);
 
-     
-      let textContent = '';
-      if (textFiles.length > 0) {
-        const file = textFiles[0];
-        textContent = await file.text();
-      }
-
-      const gptResponse = await fetch('/api/chatgpt/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          playerId: player.id,
-          name: player.name,
-          details,
-          textContent,
-        }),
+      const res = await fetch(`/api/users/${userId}/favorites/${playerId}`, {
+        method: isFavorited ? 'DELETE' : 'POST',
       });
 
-      if (!gptResponse.ok) {
-        console.error('Failed to send data to GPT:', gptResponse.statusText);
-        return;
+      if (!res.ok) {
+        throw new Error(
+          `Failed to ${isFavorited ? 'remove' : 'add'} player from favorites: ${res.statusText}`
+        );
       }
 
-      const gptResult = await gptResponse.json();
-      console.log('GPT Response:', gptResult);
-
-     
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000); 
+      if (isFavorited) {
+        setFavoritePlayerIds((prevIds) => prevIds.filter((id) => id !== playerId));
+      } else {
+        setFavoritePlayerIds((prevIds) => [...prevIds, playerId]);
+      }
     } catch (error) {
-      console.error('Error during form submission:', error);
-      setLoading(false); 
+      console.error('Error updating favorite players:', error);
     }
+  };
+
+  // Handle opening and closing the Notes modal
+  const openNotesModal = (playerId: number) => {
+    setNotesModalOpen((prevState) => ({
+      ...prevState,
+      [playerId]: true,
+    }));
+  };
+
+  const closeNotesModal = (playerId: number) => {
+    setNotesModalOpen((prevState) => ({
+      ...prevState,
+      [playerId]: false,
+    }));
   };
 
   if (loading) {
-    return (
-      <div style={modalContainerStyle}>
-        <div style={modalContentStyle}>
-          <h2 style={titleStyle}>Processing...</h2>
-          <p>Please wait while we process your request.</p>
-        </div>
-      </div>
-    );
+    return <div>Loading players...</div>;
   }
 
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  // Filter players based on the search query
+  const filteredPlayers = players.filter((player) =>
+    player.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div style={modalContainerStyle}>
-      <div style={modalContentStyle}>
-        <h2 style={titleStyle}>Add New Player</h2>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px',
+        padding: '20px',
+        backgroundColor: '#22186B',
+      }}
+    >
+      {filteredPlayers.length > 0 ? (
+        filteredPlayers.map((player: Player, index: number) => (
+          <div
+            key={player.id}
+            style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#000000',
+              color: '#ecf0f1',
+              padding: '20px',
+              borderRadius: '10px',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            {/* Star Icon for Favorite */}
+            <FaStar
+              onClick={() => handleFavoriteToggle(player.id)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                cursor: 'pointer',
+                color: favoritePlayerIds.includes(player.id) ? '#FFD700' : '#ccc',
+              }}
+              size={24}
+            />
 
-        
-        <input
-          type="text"
-          placeholder="Enter player's name"
-          value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)}
-          style={inputStyle}
-        />
+            {/* Player Photo */}
+            {player.photo && (
+              <div
+                style={{
+                  flexShrink: 0,
+                  width: '300px',
+                  height: '300px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginRight: '20px',
+                  overflow: 'hidden',
+                }}
+              >
+                <img
+                  src={player.photo}
+                  alt={`${player.name}'s photo`}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '80px',
+                    objectFit: 'contain',
+                  }}
+                />
+              </div>
+            )}
 
-       
-        <input
-          type="text"
-          placeholder="Type wanted details"
-          value={details}
-          onChange={(e) => setDetails(e.target.value)}
-          style={inputStyle}
-        />
+            {/* Player Details */}
+            <div style={{ flex: 1 }}>
+              <h2 style={{ margin: '0 0 10px', fontSize: '1.5rem' }}>{player.name}</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <p style={{ margin: '0' }}>
+                  <strong>Height:</strong> {player.height || 'Unknown'}
+                </p>
+                <p style={{ margin: '0' }}>
+                  <strong>Age:</strong> {player.age || 'Unknown'}
+                </p>
+                <p style={{ margin: '0' }}>
+                  <strong>Weight:</strong> {player.weight ? `${player.weight} lbs` : 'Unknown'}
+                </p>
+                <p style={{ margin: '0' }}>
+                  <strong>Position:</strong> {player.position || 'Unknown'}
+                </p>
+              </div>
 
-       
-        <div style={{ marginBottom: '15px', textAlign: 'left' }}>
-          <label style={{ marginBottom: '5px', display: 'block', fontWeight: 'bold' }}>Upload Photo</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handlePhotoUpload}
-            style={fileInputStyle}
-          />
-        </div>
+              {/* Player Bio */}
+              {bioVisible[index] && (
+                <div
+                  style={{
+                    marginTop: '15px',
+                    backgroundColor: '#2c2c2c',
+                    padding: '15px',
+                    borderRadius: '5px',
+                    border: '1px solid #444',
+                    textAlign: 'left',
+                    color: '#dcdcdc',
+                  }}
+                >
+                  <p>{player.playerInfo || 'Bio unavailable'}</p>
+                </div>
+              )}
 
-      
-        <div style={{ marginBottom: '20px', textAlign: 'left' }}>
-          <label style={{ marginBottom: '5px', display: 'block', fontWeight: 'bold' }}>Upload Text Files</label>
-          <input
-            type="file"
-            accept=".txt"
-            multiple
-            onChange={handleTextFilesUpload}
-            style={fileInputStyle}
-          />
-        </div>
+              {/* Buttons Container */}
+              <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
+                {/* Toggle Bio Button */}
+                <button
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#D0A043',
+                    border: 'none',
+                    color: '#fff',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.3s ease',
+                    alignSelf: 'flex-start',
+                  }}
+                  onClick={() => toggleBioVisibility(index)}
+                >
+                  {bioVisible[index] ? 'Hide Bio' : 'View Bio'}
+                </button>
 
-        
-        <button onClick={handleSubmit} style={submitButtonStyle}>Submit</button>
-        <button onClick={onClose} style={cancelButtonStyle}>Cancel</button>
-      </div>
+                {/* Notes Button */}
+                <button
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#2980b9',
+                    border: 'none',
+                    color: '#fff',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.3s ease',
+                    alignSelf: 'flex-start',
+                  }}
+                  onClick={() => openNotesModal(player.id)}
+                >
+                  Notes
+                </button>
+              </div>
+            </div>
+
+            {/* Notes Modal */}
+            {notesModalOpen[player.id] && (
+              <NotesModal onClose={() => closeNotesModal(player.id)} player={player} />
+            )}
+          </div>
+        ))
+      ) : (
+        <div>No players found</div>
+      )}
     </div>
   );
 };
 
-export default NewPlayerModal;
-
-
-const modalContainerStyle: React.CSSProperties = {
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  zIndex: 1000,
-  backdropFilter: 'blur(10px)',
-};
-
-const modalContentStyle: React.CSSProperties = {
-  backgroundColor: '#000',
-  padding: '30px',
-  borderRadius: '10px',
-  width: '400px',
-  color: '#fff',
-  textAlign: 'center',
-};
-
-const titleStyle: React.CSSProperties = {
-  marginBottom: '20px',
-  fontSize: '1.5rem',
-  fontWeight: 'bold',
-};
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '10px',
-  marginBottom: '20px',
-  borderRadius: '5px',
-  border: '1px solid #ddd',
-  backgroundColor: '#2c2c2c',
-  color: '#ecf0f1',
-  fontSize: '1rem',
-};
-
-const fileInputStyle: React.CSSProperties = {
-  display: 'block',
-  width: '100%',
-  padding: '10px',
-  backgroundColor: '#2c2c2c',
-  color: '#ecf0f1',
-  borderRadius: '5px',
-  border: '1px solid #ddd',
-  marginBottom: '15px',
-};
-
-const submitButtonStyle: React.CSSProperties = {
-  padding: '10px 20px',
-  backgroundColor: '#2980b9',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '5px',
-  fontSize: '1rem',
-  cursor: 'pointer',
-  marginBottom: '10px',
-  width: '100%',
-};
-
-const cancelButtonStyle: React.CSSProperties = {
-  padding: '10px 20px',
-  backgroundColor: '#e74c3c',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '5px',
-  fontSize: '1rem',
-  cursor: 'pointer',
-  width: '100%',
-};
+export default PlayerList;

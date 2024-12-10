@@ -13,7 +13,7 @@ export async function loginUser(email: string, password: string) {
       id: true,
       email: true,
       name: true,
-      password: true,  
+      password: true,  // Make sure password is fetched
       createdAt: true,
       updatedAt: true,
     },
@@ -23,7 +23,7 @@ export async function loginUser(email: string, password: string) {
     throw new Error("User not found");
   }
 
-  
+  // Use bcrypt.compare to compare the plain password with the hashed password in the database
   const isValidPassword = await bcrypt.compare(password, user.password);
   if (!isValidPassword) {
     throw new Error("Invalid password");
