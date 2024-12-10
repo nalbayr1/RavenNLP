@@ -1,13 +1,15 @@
+// pages/dashboard.tsx
+
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import PlayerList from '../components/PlayerList';
-import NewPlayerModal from '../components/NewPlayerModal'; 
+import NewPlayerModal from '../components/NewPlayerModal';
 
 export default function Dashboard() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(''); 
+  const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -21,6 +23,7 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userId'); // Ensure userId is removed on logout
     router.push('/');
   };
 
@@ -39,30 +42,36 @@ export default function Dashboard() {
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
       <Sidebar />
-      <div style={{
-        flexGrow: 1,
-        padding: '20px',
-        backgroundColor: '#22186B', 
-        color: 'white',
-        display: 'flex',
-        flexDirection: 'column', 
-        position: 'relative', 
-      }}>
-        
-        <div style={{
-          backgroundColor: '#000',  
+      <div
+        style={{
+          flexGrow: 1,
           padding: '20px',
-          borderRadius: '10px',
-          marginRight: '10px', 
-          marginBottom: '30px', 
-        }}>
-          <h1 style={{
-            fontSize: '2rem',
-            marginBottom: '10px',
-            color: '#ecf0f1',
-          }}>Player Search</h1>
+          backgroundColor: '#22186B',
+          color: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: '#000',
+            padding: '20px',
+            borderRadius: '10px',
+            marginRight: '10px',
+            marginBottom: '30px',
+          }}
+        >
+          <h1
+            style={{
+              fontSize: '2rem',
+              marginBottom: '10px',
+              color: '#ecf0f1',
+            }}
+          >
+            Player Search
+          </h1>
 
-         
           <input
             type="text"
             placeholder="Search for a player..."
@@ -74,18 +83,17 @@ export default function Dashboard() {
               borderRadius: '5px',
               border: '1px solid #ddd',
               fontSize: '1rem',
-              backgroundColor: '#2c2c2c', 
-              color: '#ecf0f1',  
+              backgroundColor: '#2c2c2c',
+              color: '#ecf0f1',
             }}
           />
 
-         
           <button
             onClick={handleOpenModal}
             style={{
               marginTop: '15px',
               padding: '10px 20px',
-              backgroundColor: '#27ae60', 
+              backgroundColor: '#27ae60',
               color: '#fff',
               border: 'none',
               borderRadius: '5px',
@@ -97,19 +105,19 @@ export default function Dashboard() {
           </button>
         </div>
 
-       
-        <div style={{
-          flexGrow: 1, 
-          overflowY: 'auto',
-          backgroundColor: '#22186B', 
-          padding: '10px', 
-          borderRadius: '10px', 
-        }}>
-          <PlayerList searchQuery={searchQuery} /> 
+        <div
+          style={{
+            flexGrow: 1,
+            overflowY: 'auto',
+            backgroundColor: '#22186B',
+            padding: '10px',
+            borderRadius: '10px',
+          }}
+        >
+          <PlayerList searchQuery={searchQuery} />
         </div>
 
-        
-        {isModalOpen && <NewPlayerModal onClose={handleCloseModal} />} 
+        {isModalOpen && <NewPlayerModal onClose={handleCloseModal} />}
       </div>
     </div>
   );
