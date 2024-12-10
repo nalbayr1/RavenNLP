@@ -31,18 +31,6 @@ model Player {
   createdAt   DateTime   @default(now())
   favoritedBy Favorite[] // Relation to the Favorite model
 }
-  
-model Prospect { 
-  id         Int      @id @default(autoincrement())
-  name       String
-  photo      String?  // Store the image URL
-  playerInfo String?
-  height     String?  // New field for Height
-  age        String?  // New field for Age
-  weight     String?  // New field for Weight
-  position   String?  // New field for Position
-  createdAt  DateTime @default(now())
-}
 
 model Prospect {
   id         Int      @id @default(autoincrement())
